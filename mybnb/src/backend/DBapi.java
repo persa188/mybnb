@@ -17,7 +17,8 @@ public class DBapi {
 	private static final String CONNECTION = "jdbc:mysql://127.0.0.1/mybnb?useSSL=false";
 	private static final String USER = "root";
 	private static final String PASS = "1234";
-	
+	private static final String[] cred = {USER, PASS, "mybnb?useSSL=false"};
+	private SQLController ctrlr;
 	public DBapi() {
 		//Register JDBC driver
 		try {
@@ -26,6 +27,7 @@ public class DBapi {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		ctrlr = new SQLController();
 	}
 	
 	/**
@@ -44,31 +46,22 @@ public class DBapi {
 		if (!checkDOB(dob)){ //check if age > 18
 			return false;
 		}
-		//Establish connection
 		try {
-			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
-			System.out.println("Successfully connected to MySQL!");
-			
-			//Execute a query
-			System.out.println("Preparing a statement...");
-			Statement stmt = conn.createStatement();
-			
-			//make the user account
-			String mkacc = "INSERT INTO `mybnb`.`accounts` (`user`, `pwd`, `fname`, `lname`, `dob`, `occ` ,`sin`)"
-						 + " VALUES ('"+uname+"', '"
-						 + pw + "', '"
-						 + fname + "', '"
-						 + lname + "', '"
-						 + dob + "', '"
-						 + occ + "', '"
-						 + SIN + "');";
-			stmt.execute(mkacc);
-			
-			//close conn and stmt
-			stmt.close();
-			conn.close();
-		} catch (SQLException e){
-			System.out.println(e);
+			//query
+			String q = "INSERT INTO `mybnb`.`accounts` (`user`, `pwd`, `fname`, `lname`, `dob`, `occ` ,`sin`)"
+					 + " VALUES ('"+uname+"', '"
+					 + pw + "', '"
+					 + fname + "', '"
+					 + lname + "', '"
+					 + dob + "', '"
+					 + occ + "', '"
+					 + SIN + "');";
+			ctrlr.connect(cred);
+			ctrlr.insertOp(q);
+			ctrlr.disconnect();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -108,7 +101,7 @@ public class DBapi {
 	 * @param pcode
 	 * @return
 	 */
-	public boolean addAddress(String uname, double lat, double lng, String addr,
+	public boolean addUserAddress(String uname, float lat, float lng, String addr,
 			String city, String ctry, String pcode){
 		//Establish connection
 		try {
@@ -133,28 +126,14 @@ public class DBapi {
 						+ "WHERE `user`='" + uname +"';";
 				stmt.execute(mkentry);
 			}
-			//add the actual address
-			String mkaddr = "INSERT INTO `mybnb`.`address` (`lat`, `long`, `addr`, `city`, `country`, `pcode`)"
-						  + " VALUES ('"
-						  + lat + "', '"
-						  + lng + "', '"
-						  + addr + "', '"
-						  + city + "', '"
-						  + ctry + "', '"
-						  + pcode + "');";
-			try {
-				stmt.execute(mkaddr);
-			} catch (SQLException e){
-//				System.out.println(e); //the address already exists, we dont care though..
-			}
 			//close conn and stmt
 			stmt.close();
 			conn.close();
+			return makeAddr(lat, lng, addr, city, ctry, pcode);
 		} catch (SQLException e){
 			System.out.println(e);
 			return false;
 		}
-		return true;
 	}
 	
 
@@ -191,27 +170,16 @@ public class DBapi {
 	 * @return
 	 */
 	public boolean makeHost(String uname){
-		//Establish connection
-		try {
-			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
-			System.out.println("Successfully connected to MySQL!");
-			
-			//Execute a query
-			System.out.println("Preparing a statement...");
-			Statement stmt = conn.createStatement();
-			
-			//make the user account
-			String mkacc = "INSERT INTO `mybnb`.`host` (`user`)"
+			try {
+				ctrlr.connect(cred);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			String q = "INSERT INTO `mybnb`.`host` (`user`)"
 						 + " VALUES ('"+uname+"');";
-			stmt.execute(mkacc);
-			
-			//close conn and stmt
-			stmt.close();
-			conn.close();
-		} catch (SQLException e){
-			System.out.println(e);
-			return false;
-		}
+			ctrlr.insertOp(q);
+			ctrlr.disconnect();
 		return true;
 	}
 	
@@ -227,38 +195,194 @@ public class DBapi {
 	 */
 	public boolean addCCard(String uname, int cardno, int verno, String name,
 			String type, String exp){
-		try {
-			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
-			System.out.println("Successfully connected to MySQL!");
-			
-			//Execute a query
-			System.out.println("Preparing a statement...");
-			Statement stmt = conn.createStatement();			
-			
-			//add credit card entry
-			System.out.println("Adding Card Entry...");
-			String entry = "INSERT INTO `mybnb`.`has` (`user`, `cardno`)"
+	
+			try {
+				ctrlr.connect(cred);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			String q = "INSERT INTO `mybnb`.`has` (`user`, `cardno`)"
 					+ "VALUES('"
 					+ uname +"','"
 					+ cardno + "');";
-			stmt.execute(entry);
-
-			System.out.println("Adding Card...");
-			//add actual card
-			String c = "INSERT INTO `mybnb`.`creditcard` (`cardno`, `verno`, `fullname`, `type`, `exp`)" 
+			ctrlr.insertOp(q);
+			q = "INSERT INTO `mybnb`.`creditcard` (`cardno`, `verno`, `fullname`, `type`, `exp`)" 
 					+ "VALUES ('"+ cardno + "', '"
 					+ verno + "', '"
 					+ name + "', '"
 					+ type + "', '"
 					+ exp + "');";
-			stmt.execute(c);
-			//close conn and stmt
-			stmt.close();
-			conn.close();
-		} catch (SQLException e){
-			System.out.println(e);
+			ctrlr.insertOp(q);
+			ctrlr.disconnect();
+	
+		return true;
+	}
+	
+	/**
+	 * creates a listing
+	 * @param id
+	 * @param type
+	 * @param ch
+	 * @param price
+	 * @param lat
+	 * @param lng
+	 * @param addr
+	 * @param city
+	 * @param ctry
+	 * @param pcode
+	 * @return
+	 */
+	public boolean makeListing(int id, String type, String ch, int price, int lat, int lng,
+			String addr, String city, String ctry, String pcode){
+		try {
+			ctrlr.connect(cred);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 			return false;
 		}
+
+		//make listing
+		String s = "INSERT INTO `mybnb`.`listing` (`id`, `type`, `characteristics`, `rentalPrice`)"
+				+ "VALUES ('"+ id + "', '"
+				+ type + "', '"
+				+ ch + "', '"
+				+ price + "');";
+		ctrlr.insertOp(s);
+		
+		//add addr entry
+		s = "INSERT INTO `mybnb`.`located` (`lid`, `long`, `lat`)"
+				+ "VALUES ('"+ id + "', '"
+				+ lng + "', '"
+				+ lat + "');";
+		ctrlr.insertOp(s);
+		ctrlr.disconnect();
 		return true;
+	}
+	
+	/**
+	 * adds entry to address table
+	 * @param lat
+	 * @param lng
+	 * @param addr
+	 * @param city
+	 * @param ctry
+	 * @param pcode
+	 * @return
+	 */
+	private boolean makeAddr(float lat, float lng, String addr, String city, String ctry, String pcode){
+		//Establish connection
+
+		try {
+			ctrlr.connect(cred);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			//address
+		String s = "INSERT INTO `mybnb`.`address` (`lat`, `long`, `addr`, `city`, `country`, `pcode`)"
+					  + " VALUES ('"
+					  + lat + "', '"
+					  + lng + "', '"
+					  + addr + "', '"
+					  + city + "', '"
+					  + ctry + "', '"
+					  + pcode + "');";
+		ctrlr.insertOp(s);
+		ctrlr.disconnect();
+		return true;
+	}
+	
+	/**
+	 * sets user with username uname to host of listing with listing_id.
+	 * @param uname
+	 * @param listing_id
+	 * @return
+	 */
+	public boolean hostListing(String uname, int listing_id){
+			
+			try {
+				ctrlr.connect(cred);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//hosts table, will fail if user not host
+			String s = "INSERT INTO `mybnb`.`hosts` (`user`, `lid`)"
+					  + " VALUES ('"
+					  + uname + "', '"
+					  + listing_id + "');";
+			ctrlr.insertOp(s);
+			ctrlr.disconnect();
+		return true;
+	}
+	
+	/**
+	 * adds availability to a listing
+	 * @param listing_id
+	 * @param a
+	 * @return
+	 */
+	public boolean addListingAvailability(int listing_id, String[] a){
+		return false;
+	}
+	
+	/**
+	 * adds ammenity with id aid to listing with listing_id
+	 * @param listing_id
+	 * @param aid
+	 * @return
+	 */
+	public boolean addListingAmmenities(int listing_id, int aid){
+		return true;
+	}
+	
+	/**
+	 * creats an ammenity
+	 * @param id
+	 * @param name
+	 * @param descr
+	 * @return
+	 */
+	public boolean createAmmenity(int id, String name, String descr){
+		return false;
+	}
+	
+	/**
+	 * leave feedback
+	 * @param lid
+	 * @param type
+	 * @param rating
+	 * @param comment
+	 * @return
+	 */
+	public boolean leaveFeedBack(int lid, String type, int rating, int comment){
+		/*type = renter2host, host2renter, renter2listing*/
+		return false;
+	}
+	
+	/**
+	 * get all feedback for user
+	 * @return
+	 */
+	public boolean getUserFeedback(String uname){
+		/*
+		 * x = SELECT lid from rents where rents.uname = user.uname
+		 * y = SELECT lid from hosts where hosts.uname = user.uname
+		 * take results from x and do somthing like
+		 * SELECT * From Feedback where lid={somthing from x} and type = host2renter
+		 * similarly for the host feedback except type=renter2host
+		 * */
+		return false;
+	}
+	
+	/**
+	 * get all feedback for listing
+	 * @param lid
+	 * @return
+	 */
+	public boolean getListingFeedback(int lid){
+		return false;
 	}
 }
