@@ -7,8 +7,10 @@ public class Test {
 		//test add the user daniel
 //		System.out.println(api.makeUser("testuser", "testpwd", "testname", "t", "12/21/1995", "student", 123456789));
 		//test date of birth checker
-		System.out.println(api.checkDOB("01/21/1998"));
+//		System.out.println(api.checkDOB("01/21/1998"));
 		//test add address to existing user
-		System.out.println(api.addAddress("testuser", 10, 110, "4001 steeles", "TORONTO", "CAN", "M3N2T8"));
+//		System.out.println(api.addAddress("testuser", 10, 110, "4001 steeles", "TORONTO", "CAN", "M3N2T8"));
+//		System.out.println(api.makeRenter("testuserq", 122314123, 2323, "BOB DYLAN", "MC", "12/21"));
+//		System.out.println(api.makeHost("testuser"));
 	}
 }

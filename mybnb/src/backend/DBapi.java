@@ -157,6 +157,108 @@ public class DBapi {
 		return true;
 	}
 	
+
+	public boolean makeRenter(String uname, int cardno, int verno, String name,
+			String type, String exp){
+		//Establish connection
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//make the user account
+			String mkacc = "INSERT INTO `mybnb`.`renter` (`user`)"
+						 + " VALUES ('"+uname+"');";
+			stmt.execute(mkacc);
+			
+			//close conn and stmt
+			stmt.close();
+			conn.close();
+			return addCCard(uname, cardno, verno, name, type, exp);
+
+		} catch (SQLException e){
+			System.out.println(e);
+			return false;
+		}
+	}
+
+	/**
+	 * makes user with username uname a host
+	 * @param uname
+	 * @return
+	 */
+	public boolean makeHost(String uname){
+		//Establish connection
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//make the user account
+			String mkacc = "INSERT INTO `mybnb`.`host` (`user`)"
+						 + " VALUES ('"+uname+"');";
+			stmt.execute(mkacc);
+			
+			//close conn and stmt
+			stmt.close();
+			conn.close();
+		} catch (SQLException e){
+			System.out.println(e);
+			return false;
+		}
+		return true;
+	}
 	
-	
+	/**
+	 * adds credit card to user with username uname
+	 * @param uname
+	 * @param cardno
+	 * @param verno
+	 * @param name
+	 * @param type
+	 * @param exp
+	 * @return
+	 */
+	public boolean addCCard(String uname, int cardno, int verno, String name,
+			String type, String exp){
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();			
+			
+			//add credit card entry
+			System.out.println("Adding Card Entry...");
+			String entry = "INSERT INTO `mybnb`.`has` (`user`, `cardno`)"
+					+ "VALUES('"
+					+ uname +"','"
+					+ cardno + "');";
+			stmt.execute(entry);
+
+			System.out.println("Adding Card...");
+			//add actual card
+			String c = "INSERT INTO `mybnb`.`creditcard` (`cardno`, `verno`, `fullname`, `type`, `exp`)" 
+					+ "VALUES ('"+ cardno + "', '"
+					+ verno + "', '"
+					+ name + "', '"
+					+ type + "', '"
+					+ exp + "');";
+			stmt.execute(c);
+			//close conn and stmt
+			stmt.close();
+			conn.close();
+		} catch (SQLException e){
+			System.out.println(e);
+			return false;
+		}
+		return true;
+	}
 }
