@@ -1,0 +1,124 @@
+package backend;
+
+import java.sql.*;
+import java.time.LocalDateTime;
+/**
+ * backend API
+ * @author Daniel
+ *
+ */
+public class DBapi {
+
+	private static final String dbClassName = "com.mysql.jdbc.Driver";
+	private static final String CONNECTION = "jdbc:mysql://127.0.0.1/mybnb?useSSL=false";
+	private static final String USER = "root";
+	private static final String PASS = "1234";
+	
+	public DBapi() {
+		//Register JDBC driver
+		try {
+			Class.forName(dbClassName);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * makes a user
+	 * @param uname
+	 * @param pw
+	 * @param fname
+	 * @param lname
+	 * @param dob date of birth in form dd/M/yyyy
+	 * @param occ
+	 * @param SIN
+	 * @return
+	 */
+	public boolean makeUser(String uname, String pw, String fname, String lname, String dob, String occ,
+			int SIN){
+		if (!checkDOB(dob)){ //check if age > 18
+			return false;
+		}
+		//Establish connection
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//make the user account
+			String mkacc = "INSERT INTO `mybnb`.`accounts` (`user`, `pwd`, `fname`, `lname`, `dob`, `occ` ,`sin`)"
+						 + " VALUES ('"+uname+"', '"
+						 + pw + "', '"
+						 + fname + "', '"
+						 + lname + "', '"
+						 + dob + "', '"
+						 + occ + "', '"
+						 + SIN + "');";
+			stmt.execute(mkacc);
+			
+			//close conn and stmt
+			stmt.close();
+			conn.close();
+		} catch (SQLException e){
+			System.out.println(e);
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * checks if age >= 18, given date of birth
+	 * @param dob
+	 * @return
+	 */
+	public boolean checkDOB(String dob) {
+		int y = Integer.parseInt(dob.substring(dob.lastIndexOf('/') + 1));
+		double d = Integer.parseInt(dob.substring(0, 2))/365;
+		double m = Integer.parseInt(dob.substring(3, 5))/12;
+		return (y + d + m) >= 18;
+	}
+
+	public boolean addAddress(String uname, double lat, double lng, String addr,
+			String city, String ctry, String pcode){
+		//Establish connection
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//add the address entry in lives
+			String mkacc = "INSERT INTO `mybnb`.`lives` (`user`, `lat`, `long`)"
+						 + " VALUES ('"+uname+"', '"+ lat + "', '" + lng + "');";
+			stmt.execute(mkacc);
+			
+			//add the actual address
+			String mkaddr = "INSERT INTO `mybnb`.`address` (`lat`, `long`, `addr`, `city`, `country`, `pcode`)"
+						  + " VALUES ('"
+						  + lat + "', '"
+						  + lng + "', '"
+						  + addr + "', '"
+						  + city + "', '"
+						  + ctry + "', '"
+						  + pcode + "');";
+			stmt.execute(mkaddr);
+			
+			//close conn and stmt
+			stmt.close();
+			conn.close();
+		} catch (SQLException e){
+			System.out.println(e);
+			return false;
+		}
+		return true;
+	}
+	
+	
+	
+}

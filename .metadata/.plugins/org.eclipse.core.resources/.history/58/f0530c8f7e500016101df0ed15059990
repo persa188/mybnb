@@ -1,0 +1,95 @@
+package backend;
+
+import java.sql.*;
+
+/**
+ * backend API
+ * @author Daniel
+ *
+ */
+public class Api {
+
+	private static final String dbClassName = "com.mysql.jdbc.Driver";
+	private static final String CONNECTION = "jdbc:mysql://127.0.0.1/mybnb?useSSL=false";
+	private static final String USER = "root";
+	private static final String PASS = "1234";
+	
+	public Api() {
+		//Register JDBC driver
+		try {
+			Class.forName(dbClassName);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * makes a user
+	 * @param uname
+	 * @param pw
+	 * @param fname
+	 * @param lname
+	 * @param dob
+	 * @param occ
+	 * @param SIN
+	 * @return
+	 */
+	public boolean makeUser(String uname, String pw, String fname, String lname, String dob, String occ,
+			int SIN){
+		//Establish connection
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//make the user account
+			String mkacc = "INSERT INTO `mybnb`.`accounts` (`user`, `pwd`, `sin`)"
+						 + " VALUES ('"+uname+"', '"+ pw + "', '" + SIN + "');";
+			stmt.execute(mkacc);
+			
+			//close conn and stmt
+			stmt.close();
+			conn.close();
+		} catch (SQLException e){
+			System.out.println(e);
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean addAddress(String uname, double lat, double lng, String addr,
+			String city, String ctry, String pcode){
+		//Establish connection
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//add the address entry in lives
+			String mkacc = "INSERT INTO `mybnb`.`lives` (`user`, `lat`, `long`)"
+						 + " VALUES ('"+uname+"', '"+ lat + "', '" + lng + "');";
+			stmt.execute(mkacc);
+			
+			//add the actual address
+			String mkaddr = "INSERT INTO `mybnb`.`lives` (`user`, `lat`, `long`)"
+					 + " VALUES ('"+uname+"', '"+ lat + "', '" + lng + "');";
+			stmt.execute(mkaddr);
+			
+			//close conn and stmt
+			stmt.close();
+			conn.close();
+		} catch (SQLException e){
+			System.out.println(e);
+			return false;
+		}
+		return true;
+	}
+	
+}

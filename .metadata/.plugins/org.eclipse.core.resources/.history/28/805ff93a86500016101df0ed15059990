@@ -1,0 +1,13 @@
+package backend;
+
+public class Test {
+	//decalare a new api instance, static for testing purposes only
+	private static DBapi api = new DBapi();
+	public static void main(String[] args){
+		//test add the user daniel
+//		System.out.println(api.makeUser("testuser", "testpwd", "testname", "t", "12/21/95", "student", 123456789));
+//		System.out.println(api.checkDOB("01/21/1998"));
+		//test add address to existing user
+		System.out.println(api.addAddress("testuser", lat, lng, addr, city, ctry, pcode));
+	}
+}

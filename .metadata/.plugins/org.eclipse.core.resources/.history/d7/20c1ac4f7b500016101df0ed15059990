@@ -1,0 +1,11 @@
+package backend;
+
+public class Test {
+	//decalare a new api instance
+	Api api = new Api();
+	public static void main(String[] args){
+		//decalare a new api
+		Api api = new Api();
+		System.out.println(api.addUser("daniel", "george", "danie", "UTSC", "12/21/95", "student", 123456789));
+	}
+}

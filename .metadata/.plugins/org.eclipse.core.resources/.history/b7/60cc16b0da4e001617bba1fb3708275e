@@ -1,0 +1,40 @@
+package db;
+
+import java.sql.*;
+
+public class Intializer {
+
+	private static final String dbClassName = "com.mysql.jdbc.Driver";
+	private static final String CONNECTION = "jdbc:mysql://127.0.0.1/mydb?useSSL=false";
+	
+	public static void main(String[] args) throws ClassNotFoundException {
+		//Register JDBC driver
+		Class.forName(dbClassName);
+		//Database credentials
+		final String USER = "root";
+		final String PASS = "1234"; //change this to "", mysql windows req pass=1234
+		System.out.println("Connecting to database...");
+		
+		try {
+			//Establish connection
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			String sql = "CREATE SCHEMA `mybnb`;";
+			stmt.execute(sql);
+			
+			//cloes connection, stmt & exit
+			System.out.println("Closing connection...");
+			stmt.close();
+			conn.close();
+			System.out.println("Success!");
+		} catch (SQLException e) {
+			System.err.println(e); //for better error msgs
+			System.err.println("Connection error occured!");
+		}
+	}
+
+}
