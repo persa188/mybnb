@@ -96,7 +96,18 @@ public class DBapi {
 		}
 		return true;
 	}
-
+	
+	/**
+	 * adds/updates the address of a user
+	 * @param uname
+	 * @param lat
+	 * @param lng
+	 * @param addr
+	 * @param city
+	 * @param ctry
+	 * @param pcode
+	 * @return
+	 */
 	public boolean addAddress(String uname, double lat, double lng, String addr,
 			String city, String ctry, String pcode){
 		//Establish connection
