@@ -109,10 +109,19 @@ public class DBapi {
 			Statement stmt = conn.createStatement();
 			
 			//add the address entry in lives
-			String mkacc = "INSERT INTO `mybnb`.`lives` (`user`, `lat`, `long`)"
+			String mkentry = "INSERT INTO `mybnb`.`lives` (`user`, `lat`, `long`)"
 						 + " VALUES ('"+uname+"', '"+ lat + "', '" + lng + "');";
-			stmt.execute(mkacc);
 			
+			try {
+				stmt.execute(mkentry);
+			} catch (SQLException e) {
+				/*entry exists, user can only live at one address though
+				so we will overwrite the prev address value*/
+				mkentry = "UPDATE `mybnb`.`lives` SET `lat`=" + lat + "," 
+						+ "`long`=" + lng
+						+ "WHERE `user`='" + uname +"';";
+				stmt.execute(mkentry);
+			}
 			//add the actual address
 			String mkaddr = "INSERT INTO `mybnb`.`address` (`lat`, `long`, `addr`, `city`, `country`, `pcode`)"
 						  + " VALUES ('"
@@ -122,8 +131,11 @@ public class DBapi {
 						  + city + "', '"
 						  + ctry + "', '"
 						  + pcode + "');";
-			stmt.execute(mkaddr);
-			
+			try {
+				stmt.execute(mkaddr);
+			} catch (SQLException e){
+//				System.out.println(e); //the address already exists, we dont care though..
+			}
 			//close conn and stmt
 			stmt.close();
 			conn.close();
