@@ -324,11 +324,34 @@ public class DBapi {
 	/**
 	 * adds availability to a listing
 	 * @param listing_id
-	 * @param a
+	 * @param start_date start date of listing availability in form MM/dd/yyyy
+	 * @param end_date the end date of listing availability in form MM/dd/yyyy
 	 * @return
 	 */
-	public boolean addListingAvailability(int listing_id, String[] a){
-		return false;
+	public boolean addListingAvailability(int listing_id, String start_date, String end_date){
+		DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			//convert to sql supported date form
+			Date d = df.parse(start_date);
+			Date c = df.parse(end_date);
+			String s = sf.format(d); //start date
+			String e = sf.format(c); //end date
+			
+			//insert to sql db
+			ctrlr.connect(cred);
+			String q = "INSERT INTO `mybnb`.`availability` (`lid`, `sdate`, `edate`)"
+					  + " VALUES ('"
+					  + listing_id + "', '"
+					  + s + "', '"
+					  + e + "');";
+			ctrlr.insertOp(q);
+			ctrlr.disconnect();
+		}catch (Exception e){
+			System.out.println(e);
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -405,7 +428,7 @@ public class DBapi {
 		double dist = kwargs[0];
 		int order = (int)kwargs[1];
 		
-		//get all the valid entries
+		//get all the valid entries, could be more efficient but runs in polynomial time so meh
 		for (List<Double> listing: addrtable){
 			double d = getDist(lat, listing.get(1), lng, listing.get(2));
 			if (d <= dist && valid.isEmpty()){
@@ -443,28 +466,30 @@ public class DBapi {
 	}
 	
 	/**
-	 * returns dist b/n two points on globe
-	 * @param d lat1
-	 * @param e lat2
-	 * @param f lng1
-	 * @param g lng2
-	 * @return
+	 * A function to calculate distance between two points on earth.
+	 * @param lat1 latitude of first point
+	 * @param lat2 latitude of second point
+	 * @param lng1 longitude of second point
+	 * @param lng2 longitude of second point
+	 * @return distance in KM between (lat1, lng1) and (lat2, lng2)
 	 */
 	public double getDist(double lat1, double lat2, double lng1, double lng2){
+		/*The Following code is basically the haversine formula converted to java code*/
 		double R = 6371e3;
 		double dlat = lat2 - lat1;
 		double dlong = lng2 - lng1;
 		double a = Math.pow((Math.sin(dlat/2)), 2) + Math.cos(lat2) * Math.cos(lat1)
 				* Math.pow(Math.sin(dlong/2),2);
 		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-		return c * 6371;
+		return c * 6373; /*6371 is earths radius in KM, use 6373 to account for margin of err.
+		                   that occurs due to he fact that earth isnt a perfect sphere during rotation*/
 	}
 	
 	/**
 	 * gets table "located" from db, that stores listing id, lat, lng
 	 * remember to cast listing id to int if you're trying to use it as
 	 * it is casted to double in order to store it
-	 * @return List<List<double lid, double lat, double lng>>
+	 * @return List<List<double lid, double lat, double lng>> `mybnb`.`located` table
 	 */
 	public List<List<Double>> getAddrMapping(){
 		//Establish connection
@@ -501,7 +526,13 @@ public class DBapi {
 		return res;
 	}
 	
-
+	
+	/**
+	 * function that checks database for login credentials.
+	 * @param uname username
+	 * @param pwd password
+	 * @return true iff uname:pwd are valid login credentials, false o/w
+	 */
 	public boolean Login(String uname, String pwd){
 		
 		try {
@@ -520,7 +551,7 @@ public class DBapi {
 			while(r.next()){
 
 				if (r.getString("user").equals(uname) && r.getString("pwd").equals(pwd)){
-					//close conn and stmt
+					//close conn and stmt & return
 					stmt.close();
 					conn.close();
 					return true;
@@ -531,9 +562,121 @@ public class DBapi {
 			conn.close();
 			return false;
 		} catch (SQLException e){
-			System.out.println(e);
+			System.out.println(e); //kept for debugging purposes
 			return false;
 		}
 		
+	}
+	
+	private Date SQLStrtoDate(String d){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date dte;
+		try {
+			dte = sdf.parse(d);
+			return dte;
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
+	 * attempts to rent the listing given username, listing id, start date sdate, and end date edate
+	 * @param uname
+	 * @param listing_id
+	 * @param sdate
+	 * @param edate
+	 * @return
+	 */
+	public boolean rentListing(String uname, int listing_id, String sdate, String edate){
+		//check that sdate > sdate from listing and edate < edate from listing
+		//then check each person renting doesnt conflict with you
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//query
+			String q = "SELECT * FROM availability";
+			ResultSet rs  = stmt.executeQuery(q);
+			
+			DateFormat df = new SimpleDateFormat("MM-dd-yyyy"); // for converting to date
+			DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd"); //for inserting to table
+			Date s2;
+			Date e2;
+			try {
+				s2 = df.parse(sdate);
+				e2 = df.parse(edate);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
+
+			//not check if availabilty for listing is OK!
+			boolean avail = false;
+			while (rs.next()){
+				Date s1 = SQLStrtoDate(rs.getString("sdate"));
+				Date e1 = SQLStrtoDate(rs.getString("edate"));
+				System.out.println(s1 + ":"+ s2);
+				if ((s1.before(s2)
+						|| s1.equals(s2))
+						&& (e1.after(e2)
+								|| e2.equals(e1))
+						&& rs.getInt("lid") == listing_id){
+					avail = true;
+				}
+			}
+						
+			//check against other renters
+			q = "SELECT * FROM rents";
+			rs = stmt.executeQuery(q);
+			System.out.println("hi "+ avail);
+			while(rs.next()){
+				Date s1 = SQLStrtoDate(rs.getString("sdate"));
+				Date e1 = SQLStrtoDate(rs.getString("edate"));
+				if ( (rs.getInt("lid") == listing_id)
+						&& !(
+								(e1.before(s2) && e1.before(s2))) || //their booking is before theirs
+								(e2.before(e1) && e2.before(s1)) //your booking is before yours
+								){
+					avail = false;
+					break;
+				}
+			}
+
+			//close conn and stmt
+			stmt.close();
+			conn.close();
+			//if available add to rents
+			if (avail){
+				sdate = df2.format(s2);
+				edate = df2.format(e2);
+				q = "INSERT INTO `mybnb`.rents (`ruser`,`lid`, `sdate`, `edate`)"
+						  + " VALUES ('"
+						  + uname + "', '"
+						  + listing_id + "', '"
+						  + sdate + "', '"
+						  + edate + "');";
+				ctrlr.connect(cred);
+				ctrlr.insertOp(q);
+				ctrlr.disconnect();
+				return true;
+			}else {
+				return false;
+			}
+
+		} catch (SQLException e){
+			System.out.println(e); //kept for debugging purposes
+			return false;
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

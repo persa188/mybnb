@@ -18,6 +18,7 @@ public class Test {
 //		System.out.println(api.getDist(43.7741600, 43.775107, -79.5241100, -79.525159));
 //
 //		System.out.println(api.getListingByLoc(43.7741600, -79.5241100, t));
-		System.out.println(api.Login("test", "test2"));
+//		System.out.println(api.Login("test", "test2"));
+		System.out.println(api.rentListing("test2", 1, "12-12-1994", "12-21-1995"));
 	}
 }
