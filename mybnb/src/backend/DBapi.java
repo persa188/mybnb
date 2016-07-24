@@ -500,4 +500,40 @@ public class DBapi {
 		}
 		return res;
 	}
+	
+
+	public boolean Login(String uname, String pwd){
+		
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//query
+			String q = "SELECT * FROM accounts;";
+			ResultSet r  = stmt.executeQuery(q);
+			
+			//not the most efficient way, however COUNT() was buggy so..
+			while(r.next()){
+
+				if (r.getString("user").equals(uname) && r.getString("pwd").equals(pwd)){
+					//close conn and stmt
+					stmt.close();
+					conn.close();
+					return true;
+				} 
+			}
+			//close conn and stmt
+			stmt.close();
+			conn.close();
+			return false;
+		} catch (SQLException e){
+			System.out.println(e);
+			return false;
+		}
+		
+	}
 }
