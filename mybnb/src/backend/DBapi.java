@@ -1,10 +1,13 @@
 package backend;
 
 import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 /**
  * backend API
  * @author Daniel
@@ -384,5 +387,117 @@ public class DBapi {
 	 */
 	public boolean getListingFeedback(int lid){
 		return false;
+	}
+	
+	/**
+	 * returns listings within specifc distance from position at (lat, lng)
+	 * kwargs[0] is the distance value in km, set kwargs[1] to 0 if you would
+	 * like distance to be returned in ascending order, or 1 for descending order.
+	 * @param lat
+	 * @param lng
+	 * @param kwargs
+	 * @return
+	 */
+	public List<Integer> getListingByLoc(double lat, double lng, double [] kwargs){
+		List<List<Double>> addrtable= getAddrMapping();
+		List<Integer> res = new ArrayList<>();
+		List<List<Double>> valid = new ArrayList<>();
+		double dist = kwargs[0];
+		int order = (int)kwargs[1];
+		
+		//get all the valid entries
+		for (List<Double> listing: addrtable){
+			double d = getDist(lat, listing.get(1), lng, listing.get(2));
+			if (d <= dist && valid.isEmpty()){
+				ArrayList<Double> temp = new ArrayList<>();
+				temp.add(listing.get(0)); temp.add(d);
+				valid.add(temp);
+			} else if (d <= dist){
+				ArrayList<Double> temp = new ArrayList<>();
+				temp.add(listing.get(0)); temp.add(d);
+				int index = valid.size();
+				for (List <Double> l: valid){
+					if (l.get(1) > d){
+						index = valid.indexOf(l);
+						break;
+					}
+				}
+				if (index == valid.size()){
+					valid.add(temp);
+				} else {
+					valid.add(index, temp);
+				}
+			}
+		}
+		
+		//make the res list
+		for (List<Double> l: valid) {
+			if (order == 0){
+				res.add(l.get(0).intValue());
+			} else {
+				res.add(0, l.get(0).intValue());
+			}
+		}
+		
+		return res;
+	}
+	
+	/**
+	 * returns dist b/n two points on globe
+	 * @param d lat1
+	 * @param e lat2
+	 * @param f lng1
+	 * @param g lng2
+	 * @return
+	 */
+	public double getDist(double lat1, double lat2, double lng1, double lng2){
+		double R = 6371e3;
+		double dlat = lat2 - lat1;
+		double dlong = lng2 - lng1;
+		double a = Math.pow((Math.sin(dlat/2)), 2) + Math.cos(lat2) * Math.cos(lat1)
+				* Math.pow(Math.sin(dlong/2),2);
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		return c * 6371;
+	}
+	
+	/**
+	 * gets table "located" from db, that stores listing id, lat, lng
+	 * remember to cast listing id to int if you're trying to use it as
+	 * it is casted to double in order to store it
+	 * @return List<List<double lid, double lat, double lng>>
+	 */
+	public List<List<Double>> getAddrMapping(){
+		//Establish connection
+		ArrayList<List<Double>> res = new ArrayList<>();
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//query
+			String q = "SELECT * FROM located";
+			
+			ResultSet rs = stmt.executeQuery(q);
+			while (rs.next()) {
+				ArrayList<Double> temp = new ArrayList<Double>();
+				double lid = rs.getInt("lid");
+				double lat = rs.getDouble("lat");
+				double lng = rs.getDouble("long");
+				temp.add(lid); temp.add(lat); temp.add(lng);
+				res.add(temp);
+			}
+			
+			//close conn and stmt
+			stmt.close();
+			conn.close();
+
+		} catch (SQLException e){
+			System.out.println(e);
+			return res;
+		}
+		return res;
 	}
 }
