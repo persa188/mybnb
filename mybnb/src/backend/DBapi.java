@@ -2,6 +2,9 @@ package backend;
 
 import java.sql.*;
 import java.util.List;
+
+import javax.swing.plaf.synth.SynthSplitPaneUI;
+
 import java.util.ArrayList;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -116,7 +119,7 @@ public class DBapi {
 			Statement stmt = conn.createStatement();
 			
 			//add the address entry in lives
-			String mkentry = "INSERT INTO `mybnb`.`lives` (`user`, `lat`, `long`)"
+			String mkentry = "INSERT INTO `mybnb`.`lives` (`user`, `lat`, `lng`)"
 						 + " VALUES ('"+uname+"', '"+ lat + "', '" + lng + "');";
 			
 			try {
@@ -125,7 +128,7 @@ public class DBapi {
 				/*entry exists, user can only live at one address though
 				so we will overwrite the prev address value*/
 				mkentry = "UPDATE `mybnb`.`lives` SET `lat`=" + lat + "," 
-						+ "`long`=" + lng
+						+ "`lng`=" + lng
 						+ "WHERE `user`='" + uname +"';";
 				stmt.execute(mkentry);
 			}
@@ -255,7 +258,7 @@ public class DBapi {
 		ctrlr.insertOp(s);
 		
 		//add addr entry
-		s = "INSERT INTO `mybnb`.`located` (`lid`, `long`, `lat`)"
+		s = "INSERT INTO `mybnb`.`located` (`lid`, `lng`, `lat`)"
 				+ "VALUES ('"+ id + "', '"
 				+ lng + "', '"
 				+ lat + "');";
@@ -284,7 +287,7 @@ public class DBapi {
 			e.printStackTrace();
 		}
 			//address
-		String s = "INSERT INTO `mybnb`.`address` (`lat`, `long`, `addr`, `city`, `country`, `pcode`)"
+		String s = "INSERT INTO `mybnb`.`address` (`lat`, `lng`, `addr`, `city`, `country`, `pcode`)"
 					  + " VALUES ('"
 					  + lat + "', '"
 					  + lng + "', '"
@@ -385,6 +388,7 @@ public class DBapi {
 	 */
 	public boolean leaveFeedBack(int lid, String type, int rating, int comment){
 		/*type = renter2host, host2renter, renter2listing*/
+		//insert op and set type
 		return false;
 	}
 	
@@ -475,7 +479,6 @@ public class DBapi {
 	 */
 	public double getDist(double lat1, double lat2, double lng1, double lng2){
 		/*The Following code is basically the haversine formula converted to java code*/
-		double R = 6371e3;
 		double dlat = lat2 - lat1;
 		double dlong = lng2 - lng1;
 		double a = Math.pow((Math.sin(dlat/2)), 2) + Math.cos(lat2) * Math.cos(lat1)
@@ -510,7 +513,7 @@ public class DBapi {
 				ArrayList<Double> temp = new ArrayList<Double>();
 				double lid = rs.getInt("lid");
 				double lat = rs.getDouble("lat");
-				double lng = rs.getDouble("long");
+				double lng = rs.getDouble("lng");
 				temp.add(lid); temp.add(lat); temp.add(lng);
 				res.add(temp);
 			}
@@ -635,7 +638,6 @@ public class DBapi {
 			//check against other renters
 			q = "SELECT * FROM rents";
 			rs = stmt.executeQuery(q);
-			System.out.println("hi "+ avail);
 			while(rs.next()){
 				Date s1 = SQLStrtoDate(rs.getString("sdate"));
 				Date e1 = SQLStrtoDate(rs.getString("edate"));
@@ -677,6 +679,63 @@ public class DBapi {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
+		}
+	}
+	
+	public List<Integer> getListingByPrice(){
+		return null;
+	}
+	
+	public List<Integer> getListingByPostalCode(){
+		return null;
+	}
+	
+	public List<Integer> filterListingsByDateRange(){
+		return null;
+	}
+	
+	/**
+	 * gets a listing by address if listing exists
+	 * @param addr address to search for (street addr)
+	 * @param city the city
+	 * @param ctry the country
+	 * @param pcode the postal code
+	 * @return id of listing or null if no such listing
+	 */
+	public Integer getListing(String addr, String city, String ctry, String pcode){
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//query
+			String q = "SELECT * FROM address WHERE city='"
+					+city+"' and country='" + ctry + "' and pcode='"
+					+ pcode + "' and addr='" + addr +"';";
+			ResultSet rs  = stmt.executeQuery(q);
+			double lat = Double.NaN;
+			double lng = Double.NaN;
+			while (rs.next()){
+				lat = rs.getDouble("lat");
+				lng = rs.getDouble("lng");
+			}
+			if (lat == Double.NaN || lng == Double.NaN) {
+				return null;
+			}
+			
+			//get lid
+			q = "SELECT lid FROM located JOIN listing WHERE lng=" +lat +" and lat="+lng+";";
+			rs = stmt.executeQuery(q);
+			while(rs.next()){
+				return rs.getInt("lid");
+			} return null;
+			
+		}catch (Exception e) {
+			System.out.println(e);
+			return null;
 		}
 	}
 }
