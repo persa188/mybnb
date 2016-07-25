@@ -12,7 +12,7 @@ public class Reports {
 	private static final String dbClassName = "com.mysql.jdbc.Driver";
 	private static final String CONNECTION = "jdbc:mysql://127.0.0.1/mybnb?useSSL=false";
 	private static final String USER = "root";
-	private static final String PASS = "1234";
+	private static final String PASS = "";
 	private static final String[] cred = {USER, PASS, "mybnb?useSSL=false"};
 	private SQLController ctrlr;
 

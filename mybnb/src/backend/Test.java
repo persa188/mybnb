@@ -41,5 +41,6 @@ public class Test {
 ////		r.getNumListingsPerCountry();
 //		r.getNumListingsPerCountryAndCity();
 //		r.getNumListingsPerCountryAndCityAndPostal();
+		System.out.println(api.removeUser("test"));
 	}
 }

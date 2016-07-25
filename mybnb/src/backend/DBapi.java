@@ -19,7 +19,7 @@ public class DBapi {
 	private static final String dbClassName = "com.mysql.jdbc.Driver";
 	private static final String CONNECTION = "jdbc:mysql://127.0.0.1/mybnb?useSSL=false";
 	private static final String USER = "root";
-	private static final String PASS = "1234";
+	private static final String PASS = "";
 	private static final String[] cred = {USER, PASS, "mybnb?useSSL=false"};
 	private SQLController ctrlr;
 	public DBapi() {
@@ -932,6 +932,24 @@ public class DBapi {
 			ctrlr.disconnect();
 			return true;
 		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e);
+			return false;
+		}
+	}
+	
+	public boolean removeUser(String uname){
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			String p = "DELETE FROM accounts WHERE user='"+uname+"';";
+			stmt.execute(p);
+			return true;
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			System.out.println(e);
 			return false;
