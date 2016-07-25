@@ -13,7 +13,7 @@ public class Test {
 		//test date of birth checker
 //		System.out.println(api.checkDOB("01/21/1998"));
 		//test add address to existing user
-//		System.out.println(api.addUserAddress("testuser234", 10, 110, "4001 steeles", "TORONTO", "CAN", "M3N2T8"));
+//		System.out.println(api.addUserAddress("testuser2343", 140, 110, "4001 steeles", "TORONTO", "CAN", "M3N2T8"));
 //		System.out.println(api.makeRenter("testuserq34", 122314123, 2323, "BOB DYLAN", "MC", "12/21"));
 //		System.out.println(api.makeHost("testuser34"));
 //		System.out.println(api.getDist(44.968046, -94.420307, 44.33328, -89.132008));
@@ -40,6 +40,6 @@ public class Test {
 //		r.getNumBookingsByPCode("1900-12-21", "2040-12-21");
 ////		r.getNumListingsPerCountry();
 //		r.getNumListingsPerCountryAndCity();
-		r.getNumListingsPerCountryAndCityAndPostal();
+//		r.getNumListingsPerCountryAndCityAndPostal();
 	}
 }
