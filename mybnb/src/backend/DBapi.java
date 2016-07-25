@@ -363,7 +363,20 @@ public class DBapi {
 	 * @return
 	 */
 	public boolean addListingAmmenities(int listing_id, int aid){
-		return true;
+		try {
+			ctrlr.connect(cred);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		try{
+			String q = "INSERT INTO offers(id, aid) VALUES('"
+				+listing_id+"', '"+aid+"');";
+			ctrlr.insertOp(q);
+			ctrlr.disconnect();
+			return true;
+		} catch (Exception e){System.out.println("insertion fail");return false;}
 	}
 	
 	/**
@@ -374,36 +387,88 @@ public class DBapi {
 	 * @return
 	 */
 	public boolean createAmmenity(int id, String name, String descr){
-		return false;
+		try{
+			ctrlr.connect(cred);
+			String q = "INSERT INTO ammenities(id, name, description) VALUES('"
+					+ id +"', '"
+					+ name +"', '"
+					+ descr +"');";
+			ctrlr.insertOp(q);
+			ctrlr.disconnect();
+			return true;
+		}catch (Exception e){
+			System.out.println(e);
+			return false;
+		}
 	}
 	
 	/**
 	 * leave feedback
-	 * @param lid
-	 * @param type
-	 * @param rating
-	 * @param comment
+	 * @param lid listing id
+	 * @param type renter2host, host2renter, renter2listing
+	 * @param rating *mandatory
+	 * @param comment *mandatory
 	 * @return
 	 */
-	public boolean leaveFeedBack(int lid, String type, int rating, int comment){
+	public boolean makeFeedBack(int lid, String type, int rating, String comment){
 		/*type = renter2host, host2renter, renter2listing*/
 		//insert op and set type
-		return false;
+		try {
+			ctrlr.connect(cred);
+			String q = "INSERT INTO feedback(type, lid, rating, comment) VALUES('"
+					+ type +"', '"
+					+ lid +"', '"
+					+ rating + "', '"
+					+ comment +"');";
+			ctrlr.insertOp(q);
+			ctrlr.disconnect();
+			return true;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e);
+			return false;
+		}
 	}
 	
+	public boolean leaveUserFeedback(String user1, String user2, int fid){
+		try {
+			ctrlr.connect(cred);
+			String q = "INSERT INTO gives(user, fid) VALUES('"+user2+"', '"+fid+"');";
+			ctrlr.insertOp(q);
+			q = "INSERT INTO receives(user, fid) VALUES('"+user1+"', '"+fid+"');";
+			ctrlr.disconnect();
+			return true;
+		} catch (Exception e){
+			System.out.println(e);
+			return false;
+		}
+	}
+
 	/**
 	 * get all feedback for user
-	 * @return
+	 * @return list of feedback id's for use in feedback table
 	 */
-	public boolean getUserFeedback(String uname){
-		/*
-		 * x = SELECT lid from rents where rents.uname = user.uname
-		 * y = SELECT lid from hosts where hosts.uname = user.uname
-		 * take results from x and do somthing like
-		 * SELECT * From Feedback where lid={somthing from x} and type = host2renter
-		 * similarly for the host feedback except type=renter2host
-		 * */
-		return false;
+	public List<Integer> getUserFeedback(String uname){
+		ArrayList<Integer> res = new ArrayList<>();
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//query
+			String q = "SELECT * FROM receives WHERE ruser='"+uname+"';";
+			ResultSet rs = stmt.executeQuery(q);
+			while(rs.next()){
+				res.add(rs.getInt("fid"));
+			}
+			return res;
+		} catch (Exception e){
+			System.out.println(e);
+			return new ArrayList<>();
+		}
 	}
 	
 	/**

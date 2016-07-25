@@ -31,5 +31,9 @@ public class Test {
 //		System.out.println(api.filterListingsByDateRange(l, "2012-12-12" , "2013-12-12"));
 //		System.out.println(api.getListingByPrice(0));
 //		System.out.println(api.getListingByPrice(1));
+//		System.out.println(api.addListingAmmenities(1, 1));
+//		System.out.println(api.makeFeedBack(111, "user2host", 5, "CSADFD"));
+//		System.out.println(api.createAmmenity(100, "TEST", "TSET"));
+		System.out.println(api.getUserFeedback("tetuser"));
 	}
 }
