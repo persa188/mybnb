@@ -21,8 +21,6 @@ USE `mybnb` ;
 -- -----------------------------------------------------
 -- Table `mybnb`.`accounts`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`accounts` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`accounts` (
   `user` VARCHAR(45) NOT NULL,
   `pwd` VARCHAR(45) NOT NULL,
@@ -39,8 +37,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`address`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`address` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`address` (
   `lat` DOUBLE NOT NULL,
   `lng` DOUBLE NOT NULL,
@@ -56,8 +52,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`ammenities`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`ammenities` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`ammenities` (
   `id` INT(11) NOT NULL,
   `name` VARCHAR(45) NOT NULL,
@@ -70,8 +64,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`availability`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`availability` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`availability` (
   `lid` INT(11) NOT NULL,
   `sdate` DATE NOT NULL,
@@ -82,10 +74,19 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
+-- Table `mybnb`.`cancelled`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mybnb`.`cancelled` (
+  `user` VARCHAR(45) NOT NULL,
+  `lid` INT(11) NOT NULL,
+  PRIMARY KEY (`user`, `lid`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
 -- Table `mybnb`.`creditcard`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`creditcard` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`creditcard` (
   `cardno` INT(11) NOT NULL,
   `verno` INT(4) NOT NULL,
@@ -100,8 +101,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`feedback`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`feedback` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`feedback` (
   `type` VARCHAR(15) NOT NULL,
   `lid` INT(11) NOT NULL,
@@ -115,8 +114,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`gives`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`gives` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`gives` (
   `user` VARCHAR(45) NOT NULL,
   `fid` VARCHAR(45) NOT NULL,
@@ -128,8 +125,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`has`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`has` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`has` (
   `user` VARCHAR(45) NOT NULL,
   `cardno` INT(11) NOT NULL,
@@ -141,12 +136,10 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`have`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`have` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`have` (
   `lid` INT(11) NOT NULL,
   `fid` INT(11) NOT NULL,
-  PRIMARY KEY (`lid`))
+  PRIMARY KEY (`lid`, `fid`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -154,8 +147,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`host`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`host` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`host` (
   `user` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`user`))
@@ -166,12 +157,10 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`hosts`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`hosts` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`hosts` (
   `user` VARCHAR(45) NOT NULL,
   `lid` INT(11) NOT NULL,
-  PRIMARY KEY (`user`))
+  PRIMARY KEY (`user`, `lid`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -179,8 +168,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`listing`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`listing` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`listing` (
   `id` INT(11) NOT NULL,
   `type` VARCHAR(255) NOT NULL,
@@ -194,8 +181,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`lives`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`lives` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`lives` (
   `user` VARCHAR(45) NOT NULL,
   `lat` DOUBLE NOT NULL,
@@ -208,8 +193,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`located`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`located` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`located` (
   `lid` INT(11) NOT NULL,
   `lng` DOUBLE NOT NULL,
@@ -222,12 +205,10 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`offers`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`offers` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`offers` (
   `id` INT(11) NOT NULL,
   `aid` INT(11) NOT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`, `aid`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -235,8 +216,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`receives`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`receives` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`receives` (
   `ruser` VARCHAR(45) NOT NULL,
   `fid` INT(11) NOT NULL,
@@ -248,8 +227,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`renter`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`renter` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`renter` (
   `user` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`user`))
@@ -260,8 +237,6 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 -- Table `mybnb`.`rents`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mybnb`.`rents` ;
-
 CREATE TABLE IF NOT EXISTS `mybnb`.`rents` (
   `ruser` VARCHAR(45) NOT NULL,
   `lid` INT(11) NOT NULL,
@@ -271,6 +246,24 @@ CREATE TABLE IF NOT EXISTS `mybnb`.`rents` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
+USE `mybnb`;
+
+DELIMITER $$
+USE `mybnb`$$
+CREATE
+DEFINER=`root`@`localhost`
+TRIGGER `mybnb`.`cancelled_AFTER_INSERT`
+AFTER INSERT ON `mybnb`.`cancelled`
+FOR EACH ROW
+BEGIN
+	DELETE FROM `mybnb`.rents
+		WHERE rents.ruser = NEW.user and rents.lid = NEW.lid;
+	DELETE FROM `mybnb`.hosts
+		WHERE hosts.user = NEW.user and hosts.lid = NEW.lid;
+END$$
+
+
+DELIMITER ;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
