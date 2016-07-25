@@ -91,7 +91,7 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `mybnb`.`feedback`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mybnb`.`feedback` (
-  `type` VARCHAR(3) NOT NULL,
+  `type` VARCHAR(15) NOT NULL,
   `lid` INT(11) NOT NULL,
   `rating` INT(11) NOT NULL,
   `comment` VARCHAR(255) NULL DEFAULT NULL,
