@@ -6,6 +6,7 @@ import java.util.List;
 public class Test {
 	//decalare a new api instance, static for testing purposes only
 	private static DBapi api = new DBapi();
+	private static Reports r = new Reports();
 	public static void main(String[] args){
 		//test add the user daniel
 //		System.out.println(api.makeUser("testuser233", "testpwd", "testname", "t", "12/21/1995", "student", 123456789));
@@ -34,6 +35,11 @@ public class Test {
 //		System.out.println(api.addListingAmmenities(1, 1));
 //		System.out.println(api.makeFeedBack(111, "user2host", 5, "CSADFD"));
 //		System.out.println(api.createAmmenity(100, "TEST", "TSET"));
-		System.out.println(api.getUserFeedback("tetuser"));
+//		System.out.println(api.getUserFeedback("tetuser"));
+//		r.getNumBookingsByCity("1900-12-21", "2040-12-21");
+//		r.getNumBookingsByPCode("1900-12-21", "2040-12-21");
+////		r.getNumListingsPerCountry();
+//		r.getNumListingsPerCountryAndCity();
+		r.getNumListingsPerCountryAndCityAndPostal();
 	}
 }
