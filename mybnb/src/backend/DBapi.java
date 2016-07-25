@@ -922,4 +922,19 @@ public class DBapi {
 			return null;
 		}
 	}
+	
+	public boolean cancel(String uname, int lid) {
+		try {
+			ctrlr.connect(cred);
+			String p = "INSERT INTO cancelled(user, lid) VALUES('"
+					+uname+"', '"+lid+"');";
+			ctrlr.insertOp(p);
+			ctrlr.disconnect();
+			return true;
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e);
+			return false;
+		}
+	}
 }
