@@ -7,6 +7,7 @@ public class Test {
 	//decalare a new api instance, static for testing purposes only
 	private static DBapi api = new DBapi();
 	private static Reports r = new Reports();
+	private static HostToolkit h = new HostToolkit();
 	public static void main(String[] args){
 		//test add the user daniel
 //		System.out.println(api.makeUser("testuser233", "testpwd", "testname", "t", "12/21/1995", "student", 123456789));
@@ -41,6 +42,9 @@ public class Test {
 ////		r.getNumListingsPerCountry();
 //		r.getNumListingsPerCountryAndCity();
 //		r.getNumListingsPerCountryAndCityAndPostal();
-		System.out.println(api.removeUser("test"));
+//		System.out.println(api.removeUser("test"));
+		List<String> a = new ArrayList<>();
+		a.add("tv"); a.add("internet");
+		h.suggestAmmenities(a);
 	}
 }
