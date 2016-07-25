@@ -1,5 +1,8 @@
 package backend;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Test {
 	//decalare a new api instance, static for testing purposes only
 	private static DBapi api = new DBapi();
@@ -22,6 +25,11 @@ public class Test {
 //		System.out.println(api.rentListing("test2", 1, "12-12-1994", "12-21-1995"));
 //		System.out.println(api.getListing("1", "1", "1", "1"));
 //		System.out.println(api.makeListing(222, "apt", "nice", 14564.3, 123 , 121.222, "FM<L", "TEST","TSET", "123"));
-		
+//		System.out.println(api.getListingByPostalCode("M3N2T8"));
+//		System.out.println(api.filterListingsByDateRange("2012-12-12", "2013-12-12"));
+//		List<Integer> l = new ArrayList<>();l.add(1); l.add(2); l.add(3);
+//		System.out.println(api.filterListingsByDateRange(l, "2012-12-12" , "2013-12-12"));
+//		System.out.println(api.getListingByPrice(0));
+//		System.out.println(api.getListingByPrice(1));
 	}
 }

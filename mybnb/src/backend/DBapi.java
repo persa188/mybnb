@@ -681,16 +681,136 @@ public class DBapi {
 		}
 	}
 	
-	public List<Integer> getListingByPrice(){
-		return null;
+	/**
+	 * @param opt 0 iff ascending, 1 for descending
+	 * @return list of listing id's
+	 */
+	public List<Integer> getListingByPrice(int opt){
+		List<Integer> res = new ArrayList<>();
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//query
+			String q = "SELECT id FROM listing ORDER BY rentalPrice";
+			if (opt==1){
+				q += " DESC;";
+			}else { q += ";";}
+
+			ResultSet rs = stmt.executeQuery(q);
+			
+			while (rs.next()){
+				res.add(rs.getInt("id"));
+			}
+			rs.close();
+			conn.close();
+			return res;
+		} catch (Exception e){
+			System.out.println(e);
+			return new ArrayList<>();
+		}
 	}
 	
-	public List<Integer> getListingByPostalCode(){
-		return null;
+	/**
+	 * 
+	 * @param postal_code
+	 * @return returns a list of listing id's with similar postal codes
+	 */
+	public List<Integer> getListingByPostalCode(String postal_code){
+		List<Integer> res = new ArrayList<>();
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			//query
+			String q = "SELECT * FROM mybnb.located NATURAL JOIN mybnb.address WHERE address.pcode LIKE '"+postal_code.substring(0, 3)+"%%%'";
+
+			ResultSet rs = stmt.executeQuery(q);
+			while(rs.next()){
+				res.add(rs.getInt("lid"));
+			}
+			rs.close();
+			conn.close();
+			return res;
+		} catch (Exception e){
+			System.out.println(e);
+			return res;
+		}
 	}
 	
-	public List<Integer> filterListingsByDateRange(){
-		return null;
+	/**
+	 * 
+	 * @param s start date in form yyyy-MM-dd
+	 * @param e end date in form yyyy-MM-dd
+	 * @return
+	 */
+	public List<Integer> filterListingsByDateRange(String s, String e){
+		List<Integer> res = new ArrayList<>();
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			
+			String q = "SELECT * FROM mybnb.availability WHERE sdate <= '"+s
+					+"' and edate >= '"+e+"';";
+			
+			ResultSet rs = stmt.executeQuery(q);
+			while(rs.next()){
+				res.add(rs.getInt("lid"));
+			}
+			return res;
+		} catch (Exception ex) {
+			System.out.println(ex);
+			return res;
+		}
+	}
+	
+	/**
+	 * applies a date range filter to a list of listing id's
+	 * @param l_ids
+	 * @param s start date in form yyyy-MM-dd
+	 * @param e start date in form yyyy-MM-dd
+	 * @return list of listing id's with that satisfy filter
+	 */
+	public List<Integer> filterListingsByDateRange(List<Integer> l_ids, String s, String e){
+		List<Integer> res = new ArrayList<>();
+		try {
+			Connection conn = DriverManager.getConnection(CONNECTION,USER,PASS);
+			System.out.println("Successfully connected to MySQL!");
+			
+			//Execute a query
+			System.out.println("Preparing a statement...");
+			Statement stmt = conn.createStatement();
+			ResultSet rs = null;
+			String q;
+			for(Integer lid: l_ids){
+				q = "SELECT lid FROM mybnb.availability WHERE sdate <= '"+s
+					+"' and edate >= '"+e+"' and lid='"+ lid+"';";
+			
+				rs = stmt.executeQuery(q);
+				if (rs.next()){
+					res.add(lid);
+				}
+			}
+			rs.close();
+			conn.close();
+			return res;
+		} catch (Exception ex){
+			System.out.println(ex);
+			ResultSet rs;
+			return new ArrayList<>();
+		}
 	}
 	
 	/**
