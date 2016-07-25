@@ -20,6 +20,8 @@ public class Test {
 //		System.out.println(api.getListingByLoc(43.7741600, -79.5241100, t));
 //		System.out.println(api.Login("test", "test2"));
 //		System.out.println(api.rentListing("test2", 1, "12-12-1994", "12-21-1995"));
-		System.out.println(api.getListing("1", "1", "1", "1"));
+//		System.out.println(api.getListing("1", "1", "1", "1"));
+//		System.out.println(api.makeListing(222, "apt", "nice", 14564.3, 123 , 121.222, "FM<L", "TEST","TSET", "123"));
+		
 	}
 }

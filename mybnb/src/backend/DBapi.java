@@ -2,9 +2,6 @@ package backend;
 
 import java.sql.*;
 import java.util.List;
-
-import javax.swing.plaf.synth.SynthSplitPaneUI;
-
 import java.util.ArrayList;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -239,7 +236,7 @@ public class DBapi {
 	 * @param pcode
 	 * @return
 	 */
-	public boolean makeListing(int id, String type, String ch, int price, int lat, int lng,
+	public boolean makeListing(int id, String type, String ch, double price, double lat, double lng,
 			String addr, String city, String ctry, String pcode){
 		try {
 			ctrlr.connect(cred);
@@ -256,7 +253,7 @@ public class DBapi {
 				+ ch + "', '"
 				+ price + "');";
 		ctrlr.insertOp(s);
-		
+
 		//add addr entry
 		s = "INSERT INTO `mybnb`.`located` (`lid`, `lng`, `lat`)"
 				+ "VALUES ('"+ id + "', '"
@@ -264,6 +261,8 @@ public class DBapi {
 				+ lat + "');";
 		ctrlr.insertOp(s);
 		ctrlr.disconnect();
+		
+		makeAddr(lat, lng, addr, city, ctry, pcode);
 		return true;
 	}
 	
@@ -277,7 +276,7 @@ public class DBapi {
 	 * @param pcode
 	 * @return
 	 */
-	private boolean makeAddr(float lat, float lng, String addr, String city, String ctry, String pcode){
+	public boolean makeAddr(double lat, double lng, String addr, String city, String ctry, String pcode){
 		//Establish connection
 
 		try {
